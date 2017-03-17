@@ -40,7 +40,7 @@ I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an 
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like and finally got the following parameters that gave the hisghest SVM testing accuracy of 99.35%
 
-'''
+```
 colorspace = 'YCrCb' 
 orient = 9
 pix_per_cell = 8
@@ -48,7 +48,7 @@ cell_per_block = 2
 hog_channel = 'ALL'
 spatial = 32
 histbin = 32
-'''
+```
 
 
 ![alt text][image2]
