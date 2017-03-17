@@ -20,6 +20,7 @@ The goals / steps of this project are the following:
 [image3]: ./Screenshots/IMage3.png
 [image4]: ./Screenshots/Image4.png
 [image5]: ./Screenshots/Image5.png
+[image6]: ./Screenshots/Image6.png
 [video1]: ./project_video_out.mp4
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
@@ -38,7 +39,14 @@ I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an 
 
 ![alt text][image1]
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like and finally got the following parameters that gave the hisghest SVM testing accuracy of 99.35%
+I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like using the code in fourth code cell 
+
+
+![alt text][image6]
+
+####2. Explain how you settled on your final choice of HOG parameters.
+
+I tried various combinations of parameters and settled up with the parameters that gave me the highest SVC test accuracy of 99.35%. The following are the parameters that I finally used
 
 ```
 colorspace = 'YCrCb' 
@@ -50,36 +58,49 @@ spatial = 32
 histbin = 32
 ```
 
-
-![alt text][image2]
-
-####2. Explain how you settled on your final choice of HOG parameters.
-
-I tried various combinations of parameters and...
-
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+I concatenated features extracted from the following steps
+1. convert the image into YCrCb colorspace
+2. extracted histogram
+3. Used raw image by space binning to a size of (32, 32)
+4. extracted HOG featured from all the channels of YCrCb colorspace image
+
+I then trained a linearSVC using these features and obtained a testing accuracy of 99.35%
 
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I used the following 
+I used the following windows to search for car. The code is implemented in code cell 9
 
-![alt text][image3]
+```
+windows = slide_window(img, x_start_stop=[250, None], y_start_stop=[400, 500], 
+                    xy_window=(64, 64), xy_overlap=(0.75, 0.75))
+windows += slide_window(img, x_start_stop=[250, None], y_start_stop=[400, 500], 
+                    xy_window=(96, 96), xy_overlap=(0.75, 0.75))
+windows += slide_window(img, x_start_stop=[250, None], y_start_stop=[450, 578], 
+                    xy_window=(128, 128), xy_overlap=(0.75, 0.75))
+windows += slide_window(img, x_start_stop=[250, None], y_start_stop=[450, None], 
+                    xy_window=(192, 192), xy_overlap=(0.75, 0.75))
+```
+Here is an image to give you an ideo of windows used
+
+![alt text][image2]
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to try to minimize false positives and reliably detect cars?
 
 Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
+![alt text][image3]
 ![alt text][image4]
+![alt text][image5]
 ---
 
 ### Video Implementation
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result][video1]
 
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
