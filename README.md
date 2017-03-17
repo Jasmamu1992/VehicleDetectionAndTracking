@@ -105,17 +105,25 @@ Here's a [link to my video result][video1]
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used blob detection in Sci-kit Image (Determinant of a Hessian [`skimage.feature.blob_doh()`](http://scikit-image.org/docs/dev/auto_examples/plot_blob.html) worked best for me) to identify individual blobs in the heatmap and then determined the extent of each blob using [`skimage.morphology.watershed()`](http://scikit-image.org/docs/dev/auto_examples/plot_watershed.html). I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap for every 6 frames and then thresholded that map by 6 to identify vehicle positions.  I then used blob detection in Sci-kit Image (Determinant of a Hessian [`skimage.feature.blob_doh()`](http://scikit-image.org/docs/dev/auto_examples/plot_blob.html) worked best for me) to identify individual blobs in the heatmap and then determined the extent of each blob using [`skimage.morphology.watershed()`](http://scikit-image.org/docs/dev/auto_examples/plot_watershed.html). I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
-Here's an example result showing the heatmap and bounding boxes overlaid on a frame of video:
-
-![alt text][image5]
-
----
-
+The code is implemented in code cell 11
+I have pasted a small part of code for reference
+```
+if ProcessVideo.FrameCount>6:
+        ProcessVideo.FrameCount = 0
+        ProcessVideo.heatmap = apply_threshold(ProcessVideo.heatmap, 6)
+        ProcessVideo.labels = label(ProcessVideo.heatmap)
+        ProcessVideo.heatmap = np.zeros((720,1280))
+        
+window_img = draw_labeled_bboxes(img, ProcessVideo.labels)
+```
 ###Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Issues: I faced issue with getting rid of false positives. I had to play with the FrameCount and threshold a lot to come up with a robust vehicle detection
 
+Likely Fail: The pipeline will fail if two cars are adjacent to each other. Both the cars will be identified as a single big vehicle
+
+Solution: In order to make it robust we need to take into account that when we are detecting two cars continuously in the video for some time, one of the car cannot suddenly disspappear. So when the algorihm confuses when two cars are adjacent to each other we need to stick with old box coordinates or divide the one big box into two
